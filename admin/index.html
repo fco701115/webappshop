@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Panel Administrativo</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <div class="login-logo">Tech<span>Store</span></div>
+      <p class="login-subtitle">Panel de administración</p>
+      <form onsubmit="Admin.login(event)">
+        <div class="form-group">
+          <label>Usuario</label>
+          <input type="text" id="loginUser" value="admin" placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPass" placeholder="Contraseña">
+        </div>
+        <p id="loginError" class="login-error"></p>
+        <button type="submit" class="btn btn-primary btn-full">Iniciar sesión</button>
+      </form>
+      <a href="../index.html" class="login-back">← Volver a la tienda</a>
+    </div>
+  </div>
+
+  <!-- Admin Layout -->
+  <div id="adminLayout" class="admin-layout" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">Tech<span>Store</span> <small>Admin</small></div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" onclick="Admin.navigate('dashboard')" data-nav="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="#" onclick="Admin.navigate('products')" data-nav="products">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Productos
+        </a>
+        <a href="#" onclick="Admin.navigate('categories')" data-nav="categories">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/></svg>
+          Categorías
+        </a>
+        <a href="#" onclick="Admin.navigate('orders')" data-nav="orders">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Pedidos
+        </a>
+        <a href="#" onclick="Admin.navigate('users')" data-nav="users">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Usuarios
+        </a>
+        <a href="#" onclick="Admin.navigate('slides')" data-nav="slides">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Slides
+        </a>
+        <a href="#" onclick="Admin.navigate('banners')" data-nav="banners">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+          Banners
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="../index.html" target="_blank">Ver tienda →</a>
+        <a href="#" onclick="Admin.logout()">Cerrar sesión</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="menu-toggle" onclick="Admin.toggleSidebar()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h2 id="viewTitle">Dashboard</h2>
+        <div class="topbar-right">
+          <span class="topbar-user" id="topbarUser">admin</span>
+        </div>
+      </header>
+
+      <!-- Views -->
+      <div class="admin-content">
+
+        <!-- DASHBOARD -->
+        <div id="view-dashboard" class="admin-view active">
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><h3>Pedidos recientes</h3></div>
+            <div class="table-responsive"><table class="table" id="recentOrdersTable"><tbody></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div id="view-products" class="admin-view">
+          <div class="view-toolbar">
+            <h3>Gestión de productos</h3>
+            <button class="btn btn-primary" onclick="Admin.openModal()">+ Nuevo producto</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="productsTable">
+              <thead>
+                <tr><th>ID</th><th>Foto</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Descuento</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="productsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div id="view-categories" class="admin-view">
+          <div class="view-toolbar">
+            <h3>Gestión de categorías</h3>
+            <button class="btn btn-primary" onclick="Admin.openCategoryModal()">+ Nueva categoría</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="categoriesTable">
+              <thead><tr><th>ID</th><th>Foto</th><th>Nombre</th><th>Slug</th><th>Productos</th><th>Acciones</th></tr></thead>
+              <tbody id="categoriesBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div id="view-orders" class="admin-view">
+          <div class="view-toolbar"><h3>Gestión de pedidos</h3></div>
+          <div class="table-responsive">
+            <table class="table" id="ordersTable">
+              <thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- USERS -->
+        <div id="view-users" class="admin-view">
+          <div class="view-toolbar"><h3>Gestión de usuarios</h3></div>
+          <div class="table-responsive">
+            <table class="table" id="usersTable">
+              <thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Rol</th><th>Registro</th></tr></thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SLIDES -->
+        <div id="view-slides" class="admin-view">
+          <div class="view-toolbar">
+            <h3>Gestión de slides</h3>
+            <button class="btn btn-primary" onclick="Admin.openSlideModal()">+ Nuevo slide</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="slidesTable">
+              <thead><tr><th>ID</th><th>Título</th><th>Subtítulo</th><th>Botón</th><th>Acción</th><th>Activo</th><th>Acciones</th></tr></thead>
+              <tbody id="slidesBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BANNERS -->
+        <div id="view-banners" class="admin-view">
+          <div class="view-toolbar">
+            <h3>Gestión de banners</h3>
+            <button class="btn btn-primary" onclick="Admin.openBannerModal()">+ Nuevo banner</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="bannersTable">
+              <thead><tr><th>ID</th><th>Título</th><th>Subtítulo</th><th>Imagen</th><th>Activo</th><th>Acciones</th></tr></thead>
+              <tbody id="bannersBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Product Modal -->
+  <div class="modal-overlay" id="productModal" style="display:none;" onclick="if(event.target===this)Admin.closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Nuevo producto</h3>
+        <button class="modal-close" onclick="Admin.closeModal()">&times;</button>
+      </div>
+      <form id="productForm" onsubmit="Admin.saveProduct(event)">
+        <input type="hidden" id="pfId">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" id="pfName" required>
+          </div>
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select id="pfCategory" required></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="pfDescription" rows="3"></textarea>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Precio *</label>
+            <input type="number" id="pfListPrice" step="0.01" min="0" required oninput="Admin.autoCalcDiscount()">
+          </div>
+          <div class="form-group">
+            <label>Precio con descuento</label>
+            <input type="number" id="pfSalePrice" step="0.01" min="0" oninput="Admin.autoCalcDiscount()">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Descuento</label>
+            <div style="height:42px;display:flex;align-items:center;padding:0 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);font-size:0.9rem;color:var(--text-muted);" id="pfDiscountDisplay">0%</div>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <small style="color:var(--text-muted);font-size:0.75rem;display:block;padding-top:10px;">El descuento se calcula automáticamente al ingresar ambos precios.</small>
+          </div>
+        </div>
+        <input type="hidden" id="pfDiscount" value="0">
+        <input type="hidden" id="pfPrice" value="0">
+        <input type="hidden" id="pfOriginalPrice" value="0">
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" id="pfStock" min="0" value="10" style="max-width:140px;">
+        </div>
+        <div class="form-group">
+          <label>Fotografías (máximo 5)</label>
+          <div class="photo-slots" id="productPhotoSlots"></div>
+        </div>
+        <div class="form-group">
+          <label>Especificaciones (clave: valor, una por línea)</label>
+          <textarea id="pfSpecs" rows="4" placeholder="Ej:&#10;Núcleos: 8&#10;Frecuencia: 4.2GHz"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="Admin.closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="modalSubmit">Guardar producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div class="modal-overlay" id="categoryModal" style="display:none;" onclick="if(event.target===this)Admin.closeCategoryModal()">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="catModalTitle">Nueva categoría</h3>
+        <button class="modal-close" onclick="Admin.closeCategoryModal()">&times;</button>
+      </div>
+      <form id="categoryForm" onsubmit="Admin.saveCategory(event)">
+        <input type="hidden" id="cfId">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" id="cfName" required oninput="Admin.autoSlug()">
+        </div>
+        <div class="form-group">
+          <label>Slug (URL amigable)</label>
+          <input type="text" id="cfSlug" placeholder="se-genera-automaticamente" oninput="this.dataset.userEdited='1'">
+          <small style="color:var(--text-muted);font-size:0.75rem;">Se genera automáticamente desde el nombre. Edítalo manualmente para personalizarlo.</small>
+        </div>
+        <div class="form-group">
+          <label>Fotografía</label>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <input type="file" id="cfPhoto" accept="image/*" onchange="Admin.handleCategoryPhoto(this)">
+            <button type="button" class="btn btn-sm btn-secondary" id="cfPhotoClear" style="display:none;" onclick="Admin.clearCategoryPhoto()">Quitar foto</button>
+          </div>
+          <small style="color:var(--text-muted);font-size:0.75rem;">Selecciona una imagen desde tu computadora</small>
+        </div>
+        <div class="form-group" id="cfPhotoPreview" style="display:none;">
+          <label>Vista previa</label>
+          <img id="cfPreviewImg" src="" alt="" style="width:105px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+        </div>
+        <input type="hidden" id="cfPhotoData" value="">
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="Admin.closeCategoryModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="catModalSubmit">Guardar categoría</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Slide Modal -->
+  <div class="modal-overlay" id="slideModal" style="display:none;" onclick="if(event.target===this)Admin.closeSlideModal()">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 id="slideModalTitle">Nuevo slide</h3>
+        <button class="modal-close" onclick="Admin.closeSlideModal()">&times;</button>
+      </div>
+      <form id="slideForm" onsubmit="Admin.saveSlide(event)">
+        <input type="hidden" id="sfId">
+        <div class="form-group">
+          <label>Título *</label>
+          <input type="text" id="sfTitle" required>
+        </div>
+        <div class="form-group">
+          <label>Subtítulo</label>
+          <textarea id="sfSubtitle" rows="2"></textarea>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Texto del botón</label>
+            <input type="text" id="sfBtnText" placeholder="Ver ofertas">
+          </div>
+          <div class="form-group">
+            <label>Acción del botón</label>
+            <input type="text" id="sfBtnAction" placeholder="Nombre de categoría">
+            <small style="color:var(--text-muted);font-size:0.75rem;">Nombre de categoría para filtrar al hacer clic</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Imagen de fondo</label>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <input type="file" id="sfBgPhoto" accept="image/*" onchange="Admin.handleSlideBgPhoto(this)">
+            <button type="button" class="btn btn-sm btn-secondary" id="sfBgPhotoClear" style="display:none;" onclick="Admin.clearSlideBgPhoto()">Quitar imagen</button>
+          </div>
+          <small style="color:var(--text-muted);font-size:0.75rem;">Imagen grande que ocupará todo el fondo del slide</small>
+          <div class="form-group" id="sfBgPhotoPreview" style="display:none;">
+            <img id="sfBgPreviewImg" src="" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+          </div>
+          <input type="hidden" id="sfBgPhotoData" value="">
+        </div>
+        <div class="form-group">
+          <label>Imagen secundaria (decorativa)</label>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <input type="file" id="sfSecPhoto" accept="image/*" onchange="Admin.handleSlideSecPhoto(this)">
+            <button type="button" class="btn btn-sm btn-secondary" id="sfSecPhotoClear" style="display:none;" onclick="Admin.clearSlideSecPhoto()">Quitar imagen</button>
+          </div>
+          <small style="color:var(--text-muted);font-size:0.75rem;">Imagen pequeña decorativa (se mostrará sobre el fondo)</small>
+          <div class="form-group" id="sfSecPhotoPreview" style="display:none;">
+            <img id="sfSecPreviewImg" src="" alt="" style="width:105px;height:70px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+          </div>
+          <input type="hidden" id="sfSecPhotoData" value="">
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="sfActive" checked>
+            Slide activo
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="Admin.closeSlideModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="slideModalSubmit">Guardar slide</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Banner Modal -->
+  <div class="modal-overlay" id="bannerModal" style="display:none;" onclick="if(event.target===this)Admin.closeBannerModal()">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 id="bannerModalTitle">Nuevo banner</h3>
+        <button class="modal-close" onclick="Admin.closeBannerModal()">&times;</button>
+      </div>
+      <form id="bannerForm" onsubmit="Admin.saveBanner(event)">
+        <input type="hidden" id="bfId">
+        <div class="form-group">
+          <label>Título *</label>
+          <input type="text" id="bfTitle" required>
+        </div>
+        <div class="form-group">
+          <label>Subtítulo</label>
+          <input type="text" id="bfSubtitle">
+        </div>
+        <div class="form-group">
+          <label>Imagen de fondo</label>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <input type="file" id="bfImage" accept="image/*" onchange="Admin.handleBannerImage(this)">
+            <button type="button" class="btn btn-sm btn-secondary" id="bfImageClear" style="display:none;" onclick="Admin.clearBannerImage()">Quitar imagen</button>
+          </div>
+          <small style="color:var(--text-muted);font-size:0.75rem;">Imagen que se mostrará como fondo del banner</small>
+          <div class="form-group" id="bfImagePreview" style="display:none;">
+            <img id="bfPreviewImg" src="" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+          </div>
+          <input type="hidden" id="bfImageData" value="">
+        </div>
+        <div class="form-group">
+          <label>Enlace (categoría)</label>
+          <select id="bfLink">
+            <option value="">Sin enlace</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="bfActive" checked>
+            Banner activo
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="Admin.closeBannerModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="bannerModalSubmit">Guardar banner</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div class="modal-overlay" id="orderModal" style="display:none;" onclick="if(event.target===this)Admin.closeOrderModal()">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header">
+        <h3 id="orderModalTitle">Detalle del pedido</h3>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="btn btn-sm btn-secondary" onclick="Admin.printOrder()" title="Imprimir" style="padding:4px 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          </button>
+          <button class="btn btn-sm btn-secondary" onclick="Admin.shareOrder()" title="Compartir" style="padding:4px 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button class="modal-close" onclick="Admin.closeOrderModal()">&times;</button>
+        </div>
+      </div>
+      <div id="orderModalBody"></div>
+    </div>
+  </div>
+
+  <script src="../src/js/data.js?v=2"></script>
+  <script src="js/admin.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechStore - Tienda de Computación</title>
+  <link rel="stylesheet" href="src/css/styles.css?v=2">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <button class="mb-menu-btn" id="mbMenuBtn" onclick="App.toggleMobileMenu()" aria-label="Menú">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg class="mb-menu-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <a href="#" class="logo" onclick="App.navigate('home')">Tech<span>Store</span></a>
+      <div class="search-bar">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar productos..." id="searchInput" oninput="App.searchProducts(this.value)" onblur="setTimeout(() => App.hideSearchResults(), 200)" onfocus="App.showSearchResults()">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <button class="mb-search-btn" id="mbSearchBtn" onclick="App.toggleMobileSearch()" aria-label="Buscar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <div class="header-actions">
+        <button onclick="App.handleAccountClick()" title="Mi cuenta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <button class="mb-wishlist-btn" onclick="App.toggleWishlistSidebar()" title="Favoritos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span class="cart-badge" id="wishlistBadge">0</span>
+        </button>
+        <button onclick="Cart.toggle()" title="Carrito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Search Panel -->
+  <div class="mb-search-panel" id="mbSearchPanel">
+    <div class="container" style="position:relative;">
+      <input type="text" placeholder="Buscar productos..." id="mbSearchInput" oninput="App.searchProducts(this.value)" onblur="setTimeout(() => App.hideSearchResults(), 200)" onfocus="App.showSearchResults()">
+      <div class="search-results" id="mbSearchResults"></div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Panel -->
+  <div class="mb-menu-panel" id="mbMenuPanel">
+    <div class="container">
+      <a href="#" onclick="App.navigate('home')" data-nav="home">Inicio</a>
+      <a href="#" onclick="App.navigate('categories-view')" data-nav="categories-view">Categorías</a>
+      <a href="#" onclick="App.handleAccountClick()" data-nav="account">Mi cuenta</a>
+      <a href="#" onclick="App.navigate('contact')" data-nav="contact">Contacto</a>
+    </div>
+  </div>
+  <div class="mb-menu-overlay" id="mbMenuOverlay" onclick="App.toggleMobileMenu()"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#" class="active" onclick="App.navigate('home')" data-nav="home">Inicio</a>
+      <a href="#" onclick="App.navigate('categories-view')" data-nav="categories-view">Categorías</a>
+      <a href="#" onclick="App.handleAccountClick()" data-nav="account">Mi cuenta</a>
+      <a href="#" onclick="App.navigate('contact')" data-nav="contact">Contacto</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container" id="mainContent">
+
+    <!-- HOME VIEW -->
+    <div id="view-home">
+      <!-- Slides/Banner Dynamic -->
+      <section class="banner" id="bannerSlider"></section>
+
+      <!-- Categories -->
+      <section class="section">
+        <div class="section-header">
+          <h2>Categorías destacadas</h2>
+          <a href="#" onclick="App.navigate('categories-view')">Ver todas</a>
+        </div>
+        <div class="categories-wrapper">
+          <button class="cat-arrow cat-arrow-left" onclick="document.getElementById('categoriesCarousel').scrollBy({left: -300, behavior: 'smooth'})">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="categories-carousel" id="categoriesCarousel"></div>
+          <button class="cat-arrow cat-arrow-right" onclick="document.getElementById('categoriesCarousel').scrollBy({left: 300, behavior: 'smooth'})">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Products -->
+      <section class="section">
+        <div class="section-header">
+          <h2>Productos destacados</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="categoryFilter" onchange="App.filterByCategory(this.value)" style="height:32px;padding:0 10px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;background:var(--surface);">
+              <option value="Todas">Todas</option>
+            </select>
+          </div>
+        </div>
+        <div id="productGrid" class="product-grid"></div>
+      </section>
+
+      <!-- Dual Banners -->
+      <section class="section">
+        <div class="dual-banner-row" id="dualBannerRow"></div>
+      </section>
+    </div>
+
+    <!-- CATEGORIES VIEW -->
+    <div id="view-categories-view" style="display:none;">
+      <div style="position:relative;">
+        <button onclick="App.navigate('home')" style="position:absolute;top:0;right:0;width:36px;height:36px;border:none;background:var(--bg-secondary);border-radius:50%;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);z-index:2;">&times;</button>
+        <section class="section">
+          <div class="section-header"><h2>Todas las categorías</h2></div>
+          <div class="categories-carousel" id="allCategoriesGrid" style="flex-wrap:wrap;overflow-x:visible;justify-content:center;gap:16px;"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ACCOUNT / USER PANEL VIEW -->
+    <div id="view-account" style="display:none;">
+      <div id="loginPrompt" style="text-align:center;padding:60px 20px;max-width:800px;margin:0 auto;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted);margin-bottom:16px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <h3>Inicia sesión o regístrate</h3>
+        <p style="color:var(--text-muted);margin-bottom:20px;">Accede a tu panel de usuario para gestionar tus datos y pedidos.</p>
+        <button class="btn btn-primary btn-full" style="max-width:280px;margin:0 auto;" onclick="App.showLoginModal()">Iniciar sesión</button>
+      </div>
+      <div id="userPanel" style="display:none;">
+        <div class="account-layout">
+          <aside class="account-sidebar">
+            <div class="account-user-info">
+              <div class="account-avatar" id="accountAvatar">F</div>
+              <div>
+                <strong id="accountSidebarName" style="font-size:1rem;"></strong>
+                <span style="font-size:0.78rem;color:var(--text-muted);display:block;" id="accountSidebarType">Cliente</span>
+              </div>
+              <a href="#" class="account-dashboard-mobile" onclick="App.showAccountDashboard()" data-account-nav="dashboard" title="Panel de control" style="margin-left:auto;display:none;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text-muted);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                <span style="font-size:0.6rem;font-weight:600;">Panel</span>
+              </a>
+            </div>
+            <nav class="account-nav">
+              <a href="#" class="active" onclick="App.showAccountDashboard()" data-account-nav="dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                Panel de control
+              </a>
+              <a href="#" onclick="App.showAccountData()" data-account-nav="data">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Mis datos
+              </a>
+              <a href="#" onclick="App.showAccountOrders()" data-account-nav="orders">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Mis pedidos
+              </a>
+              <a href="#" onclick="App.showAccountAddresses()" data-account-nav="addresses">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Direcciones
+              </a>
+              <a href="#" onclick="App.showAccountWishlist()" data-account-nav="wishlist">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                Favoritos
+              </a>
+              <a href="#" onclick="App.logout()" style="color:var(--danger);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Cerrar sesión
+              </a>
+            </nav>
+          </aside>
+          <main class="account-content" id="accountContent">
+            <!-- Dynamic content loaded here -->
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT VIEW -->
+    <div id="view-contact" style="display:none;">
+      <section class="section">
+        <div class="state-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <h3>Contacto</h3>
+          <p>Escríbenos a soporte@techstore.com o llámanos al +1 (555) 123-4567</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- PRODUCT DETAIL VIEW -->
+    <div id="view-detail" class="product-detail"></div>
+
+    <!-- CHECKOUT VIEW -->
+    <div id="view-checkout" class="checkout-section"></div>
+
+    <!-- WISHLIST VIEW -->
+    <div id="view-wishlist" style="display:none; padding: 32px 0;"></div>
+
+  </main>
+
+  <!-- Cart Overlay & Sidebar -->
+  <div class="cart-overlay" id="cartOverlay" onclick="Cart.toggle()"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3>Carrito</h3>
+      <button class="cart-close" onclick="Cart.toggle()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <p>Tu carrito está vacío</p>
+      </div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+      <div class="cart-total">
+        <span>Total</span>
+        <span class="amount" id="cartTotal">$0.00</span>
+      </div>
+      <button class="btn-checkout" onclick="Cart.close(); App.navigate('checkout')">Proceder al pago</button>
+    </div>
+  </aside>
+
+  <!-- Wishlist Overlay & Sidebar -->
+  <div class="wishlist-overlay" id="wishlistOverlay" onclick="App.toggleWishlistSidebar()"></div>
+  <aside class="wishlist-sidebar" id="wishlistSidebar">
+    <div class="wishlist-header">
+      <h3 style="display:flex;align-items:center;gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Mis favoritos
+      </h3>
+      <button class="wishlist-close" onclick="App.toggleWishlistSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="wishlist-items" id="wishlistItems">
+      <div class="cart-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <p>Tu lista de favoritos está vacía</p>
+      </div>
+    </div>
+    <div class="wishlist-footer" id="wishlistFooter" style="display:none;">
+      <button class="btn-checkout" onclick="App.toggleWishlistSidebar(); App.navigate('wishlist')">Ver todos mis favoritos</button>
+    </div>
+  </aside>
+
+  <!-- Address Modal -->
+  <div class="modal-overlay" id="addressModal" style="display:none;" onclick="if(event.target===this)App.closeAddressModal()">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <h3>Nueva dirección</h3>
+        <button class="modal-close" onclick="App.closeAddressModal()">&times;</button>
+      </div>
+      <form id="addressForm" onsubmit="App.saveAddress(event)">
+        <input type="hidden" id="addrId">
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:8px;">Tipo de dirección</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <label class="addr-type-label" data-addr-type="casa" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:2px solid var(--primary);border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.2s;" onclick="App.selectAddressType('casa')">
+              <input type="radio" name="addrType" value="casa" checked style="display:none;">
+              🏠 Casa
+            </label>
+            <label class="addr-type-label" data-addr-type="trabajo" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.2s;" onclick="App.selectAddressType('trabajo')">
+              <input type="radio" name="addrType" value="trabajo" style="display:none;">
+              💼 Trabajo
+            </label>
+            <label class="addr-type-label" data-addr-type="lugar" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;transition:all 0.2s;" onclick="App.selectAddressType('lugar')">
+              <input type="radio" name="addrType" value="lugar" style="display:none;">
+              🛤️ Lugar
+            </label>
+          </div>
+          <input type="hidden" id="addrType" value="casa">
+        </div>
+        <div class="form-group">
+          <label>Dirección o lugar de entrega *</label>
+          <input type="text" id="addrLine" required placeholder="Ej. Nombre de la calle y numero de domicilio">
+        </div>
+        <div class="form-group">
+          <label>Indicación para la entrega</label>
+          <input type="text" id="addrInstructions" placeholder="Ej: Entre calles, Color de Casa, No tiene timbre">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>Localidad *</label>
+            <input type="text" id="addrCity" required placeholder="Localidad">
+          </div>
+          <div class="form-group">
+            <label>Colonia o Barrio (Opcional)</label>
+            <input type="text" id="addrDistrict" placeholder="Colonia o Barrio">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>Ciudad (Opcional)</label>
+            <input type="text" id="addrState" placeholder="Ciudad">
+          </div>
+          <div class="form-group">
+            <label>C.P. (Opcional)</label>
+            <input type="text" id="addrZip" placeholder="Código postal">
+          </div>
+        </div>
+        <p id="addressError" style="color:var(--danger);font-size:0.85rem;display:none;"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="App.closeAddressModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login / Register Modal -->
+  <div class="modal-overlay" id="loginModal" style="display:none;" onclick="if(event.target===this)App.closeLoginModal()">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h3 id="loginModalTitle">Iniciar sesión</h3>
+        <button class="modal-close" onclick="App.closeLoginModal()">&times;</button>
+      </div>
+      <div style="display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border);">
+        <button id="loginTabBtn" class="auth-tab active" onclick="App.switchAuthTab('login')" style="flex:1;padding:10px;border:none;background:none;font-weight:600;cursor:pointer;color:var(--text);border-bottom:2px solid transparent;margin-bottom:-2px;">Iniciar sesión</button>
+        <button id="registerTabBtn" class="auth-tab" onclick="App.switchAuthTab('register')" style="flex:1;padding:10px;border:none;background:none;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;">Registrarse</button>
+      </div>
+      <form id="loginForm" onsubmit="App.login(event)" style="display:block;">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••">
+        </div>
+        <p id="loginError" style="color:var(--danger);font-size:0.85rem;display:none;"></p>
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;">Iniciar sesión</button>
+      </form>
+      <form id="registerForm" onsubmit="App.register(event)" style="display:none;">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="regName" required placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" required placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+        </div>
+        <p id="registerError" style="color:var(--danger);font-size:0.85rem;display:none;"></p>
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Tech<span>Store</span></h3>
+          <p>Tu tienda de confianza para componentes de computación. Gaming, estaciones de trabajo y más.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Productos</h4>
+          <a href="#" onclick="App.filterByCategory('Procesadores')">Procesadores</a>
+          <a href="#" onclick="App.filterByCategory('Tarjetas Gráficas')">Tarjetas Gráficas</a>
+          <a href="#" onclick="App.filterByCategory('Memorias RAM')">Memorias RAM</a>
+          <a href="#" onclick="App.filterByCategory('Almacenamiento')">Almacenamiento</a>
+        </div>
+        <div class="footer-col">
+          <h4>Soporte</h4>
+          <a href="#" onclick="App.navigate('contact')">Contacto</a>
+          <a href="#">Envíos</a>
+          <a href="#">Devoluciones</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Empresa</h4>
+          <a href="#">Sobre nosotros</a>
+          <a href="#">Términos y condiciones</a>
+          <a href="#">Privacidad</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 TechStore. Todos los derechos reservados.</span>
+        <span>Hecho con dedicación para los amantes de la tecnología</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-bottom-nav">
+    <ul>
+      <li>
+        <a onclick="App.navigate('categories-view')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Categorías</span>
+        </a>
+      </li>
+      <li>
+        <a onclick="App.navigate('contact')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span>Contacto</span>
+        </a>
+      </li>
+      <li class="mb-home">
+        <a onclick="App.navigate('home')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li>
+        <a onclick="Cart.toggle()">
+          <span class="mb-cart-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="mb-cart-badge" id="mbCartBadge">0</span>
+          </span>
+          <span>Carrito</span>
+        </a>
+      </li>
+      <li>
+        <a onclick="App.handleAccountClick()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Mi cuenta</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <script src="src/js/data.js?v=3"></script>
+  <script src="src/js/cart.js?v=3"></script>
+  <script src="src/js/product-detail.js?v=3"></script>
+  <script src="src/js/checkout.js?v=3"></script>
+  <script src="src/js/app.js?v=3"></script>
+</body>
+</html>
