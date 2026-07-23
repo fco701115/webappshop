@@ -1,0 +1,23 @@
+http:
+  routers:
+    webvermart-router:
+      rule: Host(`www.compuequipo.shop`) || Host(`compuequipo.shop`)
+      service: webvermart-service
+      middlewares:
+        - redirect-to-https
+      entryPoints:
+        - web
+    webvermart-router-websecure:
+      rule: Host(`www.compuequipo.shop`) || Host(`compuequipo.shop`)
+      service: webvermart-service
+      middlewares: []
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+  services:
+    webvermart-service:
+      loadBalancer:
+        servers:
+          - url: http://webvermart:3001
+        passHostHeader: true
